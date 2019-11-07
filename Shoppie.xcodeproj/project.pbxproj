@@ -14,6 +14,7 @@
 		9C32A3382371C09C006BE35F /* Shoppie.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 9C32A3362371C09C006BE35F /* Shoppie.xcdatamodeld */; };
 		9C32A33A2371C0A1006BE35F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9C32A3392371C0A1006BE35F /* Assets.xcassets */; };
 		9C32A33D2371C0A1006BE35F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C32A33B2371C0A1006BE35F /* LaunchScreen.storyboard */; };
+		9C32A3452371C422006BE35F /* ShopperTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C32A3442371C422006BE35F /* ShopperTableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		9C32A3392371C0A1006BE35F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9C32A33C2371C0A1006BE35F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9C32A33E2371C0A1006BE35F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9C32A3442371C422006BE35F /* ShopperTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopperTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				9C32A33B2371C0A1006BE35F /* LaunchScreen.storyboard */,
 				9C32A33E2371C0A1006BE35F /* Info.plist */,
 				9C32A3362371C09C006BE35F /* Shoppie.xcdatamodeld */,
+				9C32A3442371C422006BE35F /* ShopperTableViewController.swift */,
 			);
 			path = Shoppie;
 			sourceTree = "<group>";
@@ -141,6 +144,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C32A3452371C422006BE35F /* ShopperTableViewController.swift in Sources */,
 				9C32A3382371C09C006BE35F /* Shoppie.xcdatamodeld in Sources */,
 				9C32A3322371C09C006BE35F /* ViewController.swift in Sources */,
 				9C32A32E2371C09C006BE35F /* AppDelegate.swift in Sources */,
@@ -298,7 +302,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.susie.Shoppie;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -316,7 +320,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.susie.Shoppie;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
