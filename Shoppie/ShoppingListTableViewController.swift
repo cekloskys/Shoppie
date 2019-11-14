@@ -1,57 +1,67 @@
 //
-//  ShopperTableViewController.swift
+//  ShoppingListTableViewController.swift
 //  Shoppie
 //
-//  Created by Sue Ceklosky on 11/5/19.
+//  Created by Sue Ceklosky on 11/12/19.
 //  Copyright © 2019 susie. All rights reserved.
 //
 
 import UIKit
 import CoreData
 
-class ShopperTableViewController: UITableViewController {
+class ShoppingListTableViewController: UITableViewController {
     
     // create a reference to a context
     let context = (UIApplication.shared.delegate as!
         AppDelegate).persistentContainer.viewContext
     
-    // array used to store ShoppingList entities
-    var shoppingLists = [ShoppingList] ()
+    // create a variable that will contain the row of the selected Shopping List
+    var selectedShoppingList: ShoppingList?
+    
+    // create an array to store Shopping List Items
+    var shoppingListItems = [ShoppingListItem] ()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // call the load shopping lists method
-        loadShoppingLists()
-    }
-    
-    // fetch ShoppingLists from Core Data
-    func loadShoppingLists() {
+        // call load shopping list items method
+        loadShoppingListItems()
         
-        // create an instance of a FetchRequest so that
-        // ShoppingLists can be fetched from Core Data
-        let request: NSFetchRequest<ShoppingList> = ShoppingList.fetchRequest()
-        
-        do {
-            // use context to execute a fetch request
-            // to fetch ShoppingLists from Core Data
-            // store the fetched ShoppingLists in our array
-            shoppingLists = try context.fetch(request)
-        } catch {
-            print("Error fetching ShoppingLists from Core Data!")
+        // if we have a valid Shopping List
+        if let selectedShoppingList = selectedShoppingList {
+            // get the Shopping List name and set the title
+            title = selectedShoppingList.name!
+        } else {
+            // set the title to Shopping List Items
+            title = "Shopping List Items"
         }
         
-        // reload the fetched data in the Table View Controller
+        // make row height larger
+        self.tableView.rowHeight = 84.0
+    }
+    
+    // fetch ShoppingListItems from CoreData
+    func loadShoppingListItems (){
+        // check if Shopper Table View Controller has passed a valid Shopping List
+        if let list = selectedShoppingList {
+            // if the Shopping List has items cast them to an array of ShoppingListItems
+            if let listItems = list.items?.allObjects as? [ShoppingListItem] {
+                // store constant in Shopping List Items array
+                shoppingListItems = listItems
+            }
+        }
+        
+        // reload fetched data in Table View Controller
         tableView.reloadData()
     }
     
     // save ShoppingList entities into Core Data
-    func saveShoppingLists () {
+    func saveShoppingListItems () {
         do {
             // use context to save ShoppingLists into Core Data
             try context.save()
         } catch {
-            print("Error saving ShoppingLists to Core Data!")
+            print("Error saving ShoppingListItems to Core Data!")
         }
         
         // reload the the data in the Table View Controller
@@ -62,28 +72,30 @@ class ShopperTableViewController: UITableViewController {
         
         // declare Text Fields variables for the input of the name, store, and data
         var nameTextField = UITextField()
-        var storeTextField = UITextField()
-        var dateTextField = UITextField()
+        var priceTextField = UITextField()
+        var quantityTextField = UITextField()
         
         // create an Alert Controller
-        let alert = UIAlertController(title: "Add Shopping List", message: "", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Add Shopping List Item", message: "", preferredStyle: .alert)
         
         // define an action that will occur when the Add List button is pushed
-        let action = UIAlertAction(title: "Add List", style: .default, handler: { (action) in
+        let action = UIAlertAction(title: "Add Item", style: .default, handler: { (action) in
             
             // create an instance of a ShoppingList entity
-            let newShoppingList = ShoppingList(context: self.context)
+            let newShoppingListItem = ShoppingListItem(context: self.context)
             
             // get name, store, and date input by user and store them in ShoppingList entity
-            newShoppingList.name = nameTextField.text!
-            newShoppingList.store = storeTextField.text!
-            newShoppingList.date = dateTextField.text!
+            newShoppingListItem.name = nameTextField.text!
+            newShoppingListItem.price = Double(priceTextField.text!)!
+            newShoppingListItem.quantity = Int64(quantityTextField.text!)!
+            newShoppingListItem.purchased = false
+            newShoppingListItem.shoppingList = self.selectedShoppingList
             
-            // add ShoppingList entity into array
-            self.shoppingLists.append(newShoppingList)
+            // add ShoppingListItem entity into array
+            self.shoppingListItems.append(newShoppingListItem)
             
             // save ShoppingLists into Core Data
-            self.saveShoppingLists()
+            self.saveShoppingListItems()
         })
         
         // disable the action that will occure when the Add List button is pushed
@@ -105,14 +117,14 @@ class ShopperTableViewController: UITableViewController {
             nameTextField.addTarget(self, action: #selector((self.alertTextFieldDidChange)), for: .editingChanged)
         })
         alert.addTextField(configurationHandler: { (field) in
-            storeTextField = field
-            storeTextField.placeholder = "Enter Store"
-            storeTextField.addTarget(self, action: #selector((self.alertTextFieldDidChange)), for: .editingChanged)
+            priceTextField = field
+            priceTextField.placeholder = "Enter Price"
+            priceTextField.addTarget(self, action: #selector((self.alertTextFieldDidChange)), for: .editingChanged)
         })
         alert.addTextField(configurationHandler: { (field) in
-            dateTextField = field
-            dateTextField.placeholder = "Enter Date"
-            dateTextField.addTarget(self, action: #selector((self.alertTextFieldDidChange)), for: .editingChanged)
+            quantityTextField = field
+            quantityTextField.placeholder = "Enter Quantity"
+            quantityTextField.addTarget(self, action: #selector((self.alertTextFieldDidChange)), for: .editingChanged)
         })
         
         // display the Alert Controller
@@ -128,15 +140,15 @@ class ShopperTableViewController: UITableViewController {
         let action = alertController.actions[0]
         
         // get references to the text in the Text Fields
-        if let name = alertController.textFields![0].text, let store = alertController.textFields![1].text, let date = alertController.textFields![2].text {
+        if let name = alertController.textFields![0].text, let price = alertController.textFields![1].text, let quantity = alertController.textFields![2].text {
             
             // trim whitespace from the text
             let trimmedName = name.trimmingCharacters(in: .whitespaces)
-            let trimmedStore = store.trimmingCharacters(in: .whitespaces)
-            let trimmedDate = date.trimmingCharacters(in: .whitespaces)
+            let trimmedPrice = price.trimmingCharacters(in: .whitespaces)
+            let trimmedQuantity = quantity.trimmingCharacters(in: .whitespaces)
             
             // check if the trimmed text isn't empty and if it isn't enable the the action that allows the user to add a ShoppingList
-            if (!trimmedName.isEmpty && !trimmedStore.isEmpty && !trimmedDate.isEmpty){
+            if (!trimmedName.isEmpty && !trimmedPrice.isEmpty && !trimmedQuantity.isEmpty){
                 action.isEnabled = true
             }
         }
@@ -151,19 +163,32 @@ class ShopperTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // return the number of rows
-        // we will have as many rows as there are shopping lists
-        // in the ShoppingList entity in Core Data
-        return shoppingLists.count
+        // we will have as many rows as there are shopping list items
+        return shoppingListItems.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ShoppingListCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "ShoppingListItemCell", for: indexPath)
 
         // Configure the cell...
-        let shoppingList = shoppingLists[indexPath.row]
-        cell.textLabel?.text = shoppingList.name!
-        cell.detailTextLabel?.text = shoppingList.store! + " " + shoppingList.date!
+        let shoppingListItem = shoppingListItems[indexPath.row]
+        
+        // set the cell title equal to the shopping list item name
+        cell.textLabel?.text = shoppingListItem.name!
+        
+        // set detailTextLable numberOfLines property to zero
+        cell.detailTextLabel!.numberOfLines = 0
+        
+        // set the cell subtitle equal to the shopping list item quantity and price
+        cell.detailTextLabel?.text = String(shoppingListItem.quantity) + "\n" + String(shoppingListItem.price)
+        
+        // set the cell accessory type to checkmark if purchased is equal to true, else set it to none
+        if (shoppingListItem.purchased == false){
+            cell.accessoryType = .none
+        } else {
+            cell.accessoryType = .checkmark
+        }
 
         return cell
     }
@@ -203,24 +228,14 @@ class ShopperTableViewController: UITableViewController {
     }
     */
 
+    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        // if we're segueing to the Shopping List Table View Controller
-        if (segue.identifier == "ShoppingListItems") {
-            
-            // get the index path for the row that was selected
-            // (0, 0), (0, 1), (0, 2), etc.
-            let selectedRowIndex = self.tableView.indexPathForSelectedRow
-            
-            // create an instance of the Shopping List Table View Controller
-            let shoppingListItem = segue.destination as! ShoppingListTableViewController
-            
-            // set the selected shoping list property of the Shopping List Table View Controller equal to the row of the index path
-            shoppingListItem.selectedShoppingList = shoppingLists[selectedRowIndex!.row]
-        }
+        // Get the new view controller using segue.destination.
+        // Pass the selected object to the new view controller.
     }
+    */
 
 }
